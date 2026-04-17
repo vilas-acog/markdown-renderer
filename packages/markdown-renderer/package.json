@@ -1,0 +1,43 @@
+{
+  "name": "@workspace/markdown-renderer",
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/index.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build"
+  },
+  "devDependencies": {
+    "@workspace/ui": "workspace:*",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "vite": "^8.0.8",
+    "vite-plugin-css-injected-by-js": "^5.0.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "dependencies": {
+    "react-markdown": "^10.1.0"
+  }
+}
