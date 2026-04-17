@@ -1,10 +1,80 @@
 import React from "react"
 import ReactMarkdown from "react-markdown"
+import { codeToHtml } from "shiki"
+
+import remarkGfm from "remark-gfm"
+import remarkBreaks from "remark-breaks"
+import remarkMath from "remark-math"
+import remarkEmoji from "remark-emoji"
+import remarkSmartypants from "remark-smartypants"
+
+import rehypeSlug from "rehype-slug"
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize"
+// import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+// import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeKatex from "rehype-katex"
+import rehypeExternalLinks from "rehype-external-links"
+import "katex/dist/katex.min.css"
+import rephypeHighlight from "rehype-highlight" // needs highlights for styles
+import "highlight.js/styles/github.css"
 
 import type { Components } from "react-markdown"
 
 const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
-  return <ReactMarkdown components={BASE_COMPONENTS}>{markdown}</ReactMarkdown>
+  return (
+    <ReactMarkdown
+      remarkPlugins={[
+        remarkGfm,
+        remarkBreaks,
+        remarkMath,
+        remarkEmoji,
+        [
+          remarkSmartypants,
+          {
+            dashes: "oldschool", // or 'inverted'
+            ellipses: true,
+          },
+        ],
+      ]}
+      rehypePlugins={[
+        rehypeSlug,
+        rephypeHighlight,
+        // rehypeAutolinkHeadings,
+        // [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+        // [
+        // 	rehypePrettyCode,
+        // // 	{
+        // // 		theme: 'github-dark',
+        // // 		keepBackground: false,
+        // // 	},
+        // ],
+        [
+          rehypeSanitize,
+          {
+            ...defaultSchema,
+            attributes: {
+              ...defaultSchema.attributes,
+              // remark-math outputs <div className="math"> and <span className="math">
+              // We must preserve these classes before rehype-katex processes them
+              div: [...(defaultSchema.attributes?.div || []), "className"],
+              span: [...(defaultSchema.attributes?.span || []), "className"],
+            },
+          },
+        ],
+        rehypeKatex,
+        [
+          rehypeExternalLinks,
+          {
+            target: "_blank",
+            rel: ["noopener", "noreferrer"],
+          },
+        ],
+      ]}
+      components={BASE_COMPONENTS}
+    >
+      {markdown}
+    </ReactMarkdown>
+  )
 }
 
 export default MarkdownRenderer
@@ -61,14 +131,17 @@ const BASE_COMPONENTS: Components = {
     </li>
   ),
 
-  a: ({ ...props }) => (
-    <a
-      className="text-primary underline underline-offset-2"
-      target="_blank"
-      rel="noopener noreferrer"
-      {...props}
-    />
-  ),
+  a: ({ ...props }) => {
+    const isExternal = props.href?.startsWith("http")
+    return (
+      <a
+        className="text-primary underline underline-offset-2"
+        target={isExternal ? "_blank" : "_self"}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        {...props}
+      />
+    )
+  },
 
   blockquote: ({ ...props }) => (
     <blockquote className="mt-6 border-l-2 pl-6 italic" {...props} />
@@ -96,4 +169,28 @@ const BASE_COMPONENTS: Components = {
   strong: ({ ...props }) => (
     <strong className="font-bold text-foreground/90" {...props} />
   ),
+
+  code: ({ className, children, ...props }: any) => {
+    const match = /language-(\w+)/.exec(className || "")
+    // const language = match ? match[1] : ""
+
+    // Ignore math blocks since KaTeX handles them
+    // if (language && language !== "math") {
+    //   return (
+    //     <ShikiCodeBlock
+    //       code={String(children).replace(/\n$/, "")}
+    //       language={language}
+    //     />
+    //   )
+    // }
+
+    return (
+      <code
+        className={`rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm ${className || ""}`}
+        {...props}
+      >
+        {children}
+      </code>
+    )
+  },
 }
