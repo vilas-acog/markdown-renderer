@@ -1,6 +1,4 @@
-import React from "react"
 import ReactMarkdown from "react-markdown"
-import { codeToHtml } from "shiki"
 
 import remarkGfm from "remark-gfm"
 import remarkBreaks from "remark-breaks"
@@ -22,58 +20,60 @@ import type { Components } from "react-markdown"
 
 const MarkdownRenderer = ({ markdown }: { markdown: string }) => {
   return (
-    <ReactMarkdown
-      remarkPlugins={[
-        remarkGfm,
-        remarkBreaks,
-        remarkMath,
-        remarkEmoji,
-        [
-          remarkSmartypants,
-          {
-            dashes: "oldschool", // or 'inverted'
-            ellipses: true,
-          },
-        ],
-      ]}
-      rehypePlugins={[
-        rehypeSlug,
-        rephypeHighlight,
-        // rehypeAutolinkHeadings,
-        // [rehypeAutolinkHeadings, { behavior: 'wrap' }],
-        // [
-        // 	rehypePrettyCode,
-        // // 	{
-        // // 		theme: 'github-dark',
-        // // 		keepBackground: false,
-        // // 	},
-        // ],
-        [
-          rehypeSanitize,
-          {
-            ...defaultSchema,
-            attributes: {
-              ...defaultSchema.attributes,
-              // remark-math outputs <div className="math"> and <span className="math">
-              // We must preserve these classes before rehype-katex processes them
-              div: [...(defaultSchema.attributes?.div || []), "className"],
-              span: [...(defaultSchema.attributes?.span || []), "className"],
+    <div>
+      <ReactMarkdown
+        remarkPlugins={[
+          remarkGfm,
+          remarkBreaks,
+          remarkMath,
+          remarkEmoji,
+          [
+            remarkSmartypants,
+            {
+              dashes: "oldschool", // or 'inverted'
+              ellipses: true,
             },
-          },
-        ],
-        rehypeKatex,
-        [
-          rehypeExternalLinks,
-          {
-            target: "_blank",
-            rel: ["noopener", "noreferrer"],
-          },
-        ],
-      ]}
-      components={BASE_COMPONENTS}
-    >
-      {markdown}
-    </ReactMarkdown>
+          ],
+        ]}
+        rehypePlugins={[
+          rehypeSlug,
+          rephypeHighlight,
+          // rehypeAutolinkHeadings,
+          // [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+          // [
+          // 	rehypePrettyCode,
+          // // 	{
+          // // 		theme: 'github-dark',
+          // // 		keepBackground: false,
+          // // 	},
+          // ],
+          [
+            rehypeSanitize,
+            {
+              ...defaultSchema,
+              attributes: {
+                ...defaultSchema.attributes,
+                // remark-math outputs <div className="math"> and <span className="math">
+                // We must preserve these classes before rehype-katex processes them
+                div: [...(defaultSchema.attributes?.div || []), "className"],
+                span: [...(defaultSchema.attributes?.span || []), "className"],
+              },
+            },
+          ],
+          rehypeKatex,
+          [
+            rehypeExternalLinks,
+            {
+              target: "_blank",
+              rel: ["noopener", "noreferrer"],
+            },
+          ],
+        ]}
+        components={BASE_COMPONENTS}
+      >
+        {markdown}
+      </ReactMarkdown>
+    </div>
   )
 }
 

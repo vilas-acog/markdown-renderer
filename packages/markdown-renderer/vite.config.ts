@@ -20,7 +20,12 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime"],
-      output: { assetFileNames: "index.[ext]" },
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name?.endsWith(".css")) return "index.css"
+          return "assets/[name]-[hash][extname]"
+        },
+      },
     },
   },
 })
